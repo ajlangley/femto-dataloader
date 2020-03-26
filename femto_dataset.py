@@ -7,8 +7,8 @@ import urllib
 import zipfile
 
 femto_url = 'https://ti.arc.nasa.gov/c/18/'
-bearing_loads = {}
-bearing_rpms = {}
+bearing_rpms = {'1': 1800, '2': 1650, '3': 1500}
+radial_loads = {'1': 4000, '2': 4200, '3': 5000}
 
 class FEMTODataset:
     def __init__(self, data_dir='femto-st'):
@@ -56,14 +56,13 @@ class FEMTODataset:
 class FEMTOPartition:
     def __init__(self, data_dir):
         self.data_dir = data_dir
-#         self.is_loaded = defaultdict(lambda: False)
         regex = os.path.join(self.data_dir, 'Bearing*')
         fps = list(glob.iglob(regex))
         self.bearing_names = []
         self.rtf_exps = dict()
 
         for fp in fps:
-            bearing_name = fp[7:]
+            bearing_name = fp[-3:]
             self.bearing_names.append(bearing_name)
             self.rtf_exps[bearing_name] = RTFExperiment(fp)
 
@@ -86,8 +85,8 @@ class RTFExperiment:
 
         self.bearing_name = exp_dir.split('/')[-1][7:]
         self.total_useful_life = len(fps) * 10
-        self.bearing_load = None
-        self.rpm = None
+        self.bearing_load = radial_loads[self.bearing_name[0]]
+        self.rpm = bearing_rpms[self.bearing_name[0]]
         self.measurements = []
 
         for fp in fps:
