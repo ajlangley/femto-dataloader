@@ -70,7 +70,7 @@ class FEMTOPartition:
 
     def __getitem__(self, idx):
         if type(idx) is str:
-            return self.bearing_names[idx]
+            return self.rtf_exps[idx]
 #         elif type(idx) is slice:
 #             start = idx.start if idx.start else 0
 #             stop = idx.stop if idx.stop else len(self.bearing_names)
@@ -103,10 +103,6 @@ class RTFExperiment:
         measurements = np.stack(measurements)
         self.h_acc = measurements[:, 0]
         self.v_acc = measurements[:, 1]
-
-
-    def __getitem__(self, idx):
-        return self.measurements[idx]
 
     def __len__(self):
         return len(self.measurements)
