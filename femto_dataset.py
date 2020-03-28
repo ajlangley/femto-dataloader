@@ -69,10 +69,15 @@ class FEMTOPartition:
         self.bearing_names.sort()
 
     def __getitem__(self, idx):
-        if type(idx) is not str:
-            idx = self.bearing_names[idx]
+        if type(idx) is str:
+            return self.bearing_names[idx]
+#         elif type(idx) is slice:
+#             start = idx.start if idx.start else 0
+#             stop = idx.stop if idx.stop else len(self.bearing_names)
+#             return [self.rtf_exps[self.bearing_names[i]] for i in range(start, stop)]
 
-        return self.rtf_exps[idx]
+        return self.rtf_exps[self.bearing_names[idx]]
+
 
     def __len__(self):
         return len(self.bearing_names)
@@ -87,18 +92,21 @@ class RTFExperiment:
         self.total_useful_life = len(fps) * 10
         self.bearing_load = radial_loads[self.bearing_name[0]]
         self.rpm = bearing_rpms[self.bearing_name[0]]
-        self.measurements = []
+        measurements = []
 
         for fp in fps:
             try:
-                self.measurements.append(np.loadtxt(fp, dtype=np.float32, delimiter=',')[:, -2:])
+                measurements.append(np.loadtxt(fp, dtype=np.float32, delimiter=',')[:, -2:].T)
             except ValueError:
-                self.measurements.append(np.loadtxt(fp, dtype=np.float32, delimiter=';')[:, -2:])
+                measurements.append(np.loadtxt(fp, dtype=np.float32, delimiter=';')[:, -2:].T)
 
-        self.measurements = np.stack(self.measurements)
+        measurements = np.stack(measurements)
+        self.h_acc = measurements[:, 0]
+        self.v_acc = measurements[:, 1]
 
-    def __getitem__(self, i):
-        return self.measurements[i]
+
+    def __getitem__(self, idx):
+        return self.measurements[idx]
 
     def __len__(self):
         return len(self.measurements)
